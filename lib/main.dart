@@ -1,3 +1,4 @@
+import 'package:Calculator/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui';
 
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Calculator'),
+      home: SplashScreen(),
     );
   }
 }
@@ -94,7 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
       child: Scaffold(
         extendBodyBehindAppBar: true,
         appBar: AppBar(
-          title: Text(widget.title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
+          title: Text("Calculator", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
           backgroundColor: Colors.transparent,
           elevation: 0,
           centerTitle: true,
