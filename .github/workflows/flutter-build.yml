@@ -1,0 +1,65 @@
+name: Flutter Build and Release APK
+
+on:
+  push:
+    branches:
+      - main  # Triggers when code is pushed to the main branch
+  pull_request:
+    branches:
+      - main  # Runs on PRs too
+
+jobs:
+  build:
+    name: Build APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.16.0  # Use the latest stable Flutter version
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Upload APK as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-calculator-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+  release:
+    name: Release APK
+    needs: build  # This step runs after the build step
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download APK Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: flutter-calculator-apk
+          path: build/app/outputs/flutter-apk/
+
+      - name: Get Version from pubspec.yaml
+        id: get_version
+        run: echo "::set-output name=version::$(grep 'version:' pubspec.yaml | cut -d ' ' -f2)"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.get_version.outputs.version }}
+          name: Release v${{ steps.get_version.outputs.version }}
+          draft: false
+          prerelease: false
+          files: build/app/outputs/flutter-apk/app-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
